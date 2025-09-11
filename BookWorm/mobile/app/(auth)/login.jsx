@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import axios from 'axios';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../assets/styles/login.js';
 import COLORS from "../../constant/colors.js";
@@ -42,6 +42,7 @@ const testAxios = async () => {
     timeout: 10000,
   });
   console.log("Response:", response.data);
+  Alert.alert(response.error,"All done");
 } catch (error) {
   if (error.code === 'ECONNABORTED') {
     console.error("Request timed out. Check URL and network.");
@@ -55,33 +56,20 @@ const testAxios = async () => {
 }
 };
 
-const fetchViaProxy = async () => {
+const testNoCompression = async () => {
   try {
-    const target = encodeURIComponent("https://bookworm-app-y7mx.onrender.com/");
-    const res = await fetch(`https://api.allorigins.win/raw?url=${target}`);
-    console.log('proxy status', res.status);
-    const txt = await res.text();
-    console.log('proxy body len', txt.length);
-  } catch (err) {
-    console.log('proxy ERROR', err.name, err.message);
-  }
-};
-
-const fetchWithUA = async () => {
-  try {
-    const res = await fetch("https://bookworm-app-y7mx.onrender.com/", {
-      method: "GET",
+    const r = await fetch('https://bookworm-app-y7mx.onrender.com/', {
+      method: 'GET',
       headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json",
-        // convincing browser UA
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
-      },
+        Accept: 'application/json',
+        'Accept-Encoding': 'identity',
+        Connection: 'close'
+      }
     });
-    console.log("fetchWithUA status:", res.status);
-    console.log("body:", await res.text());
+    console.log('iOS test status', r.status);
+    console.log('iOS test body', await r.text());
   } catch (err) {
-    console.log("fetchWithUA ERR", err.name, err.message);
+    console.log('iOS test ERR', err.name, err.message);
   }
 };
 
@@ -119,7 +107,7 @@ const fetchWithUA = async () => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
               // onPress={()=>router.replace("/signup")} 
-              onPress={fetchWithUA}
+              onPress={testNoCompression}
               style={styles.button}>
                 <Text style={styles.buttonText}>
                  Login

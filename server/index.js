@@ -17,33 +17,29 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 connectDB();
 
-// Response logger + safe headers middleware
+// top of server file (index.js)
 app.use((req, res, next) => {
-  // Ensure CORS and simple headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-
-  // Force connection close to avoid keep-alive/tunneling issues
-  res.setHeader('Connection', 'close');
-
-  // When response finished, log status and length
-  res.on('finish', () => {
-    try {
-      console.log('>>> RESPONSE FINISHED', {
-        time: new Date().toISOString(),
-        method: req.method,
-        originalUrl: req.originalUrl,
-        status: res.statusCode,
-        contentLength: res.getHeader('content-length') || 'unknown',
-        ip: req.ip || req.connection?.remoteAddress
-      });
-    } catch (e) { console.log('response logger err', e && e.message); }
-  });
-
+  try {
+    // Safe debug / compatibility headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    // Force plain JSON and no compression or keep-alive weirdness
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Connection', 'close');             // close after response
+    // Ensure proxies don't gzip this route unexpectedly (Cloudflare may still override)
+    res.setHeader('Cache-Control', 'no-transform');   // hint to proxies not to modify
+  } catch (e) { /* ignore */ }
   next();
 });
+
+// reliable plain health route — explicit length, closes connection
+app.get('/health-check-ios', (req, res) => {
+  const payload = JSON.stringify({ ok: true, now: new Date().toISOString() });
+  res.setHeader('Content-Length', Buffer.byteLength(payload, 'utf8'));
+  res.status(200).send(payload);
+});
+
 
 app.get('/health-check-plain', (req, res) => {
   const payload = JSON.stringify({ ok: true, now: new Date().toISOString() });
