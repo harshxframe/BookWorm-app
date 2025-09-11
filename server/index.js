@@ -5,6 +5,7 @@ import review from "./routes/reviews.js";
 import connectDB from "./libs/dbConnector.js";
 import dotenv from "dotenv";
 import path from "path";
+import { apiResponse } from "./Utils/apiResponse.js";
 dotenv.config();
 
 const app = express();
@@ -19,7 +20,7 @@ connectDB();
 
 
 app.get("/",(req,res)=>{
-    res.send("Hello I am live.");
+    res.send(apiResponse(false,{},"system running health check OK",201));
 })
 app.use("/app",auth);   //for authetification
 app.use("/app",review); //for review creation
