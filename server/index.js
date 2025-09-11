@@ -17,39 +17,39 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 connectDB();
 
-// top of server file (index.js)
+// Response logger + safe headers middleware
 app.use((req, res, next) => {
-  try {
-    // always allow CORS for debugging
-    res.setHeader('Access-Control-Allow-Origin', '*');
+  // Ensure CORS and simple headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
 
-    // log what the server sees from the client
-    console.log('>>> INCOMING DEBUG', {
-      time: new Date().toISOString(),
-      ip: req.ip || req.connection?.remoteAddress,
-      host: req.headers.host,
-      origin: req.headers.origin,
-      ua: req.headers['user-agent']
-    });
+  // Force connection close to avoid keep-alive/tunneling issues
+  res.setHeader('Connection', 'close');
 
-    // normalize user-agent so naive WAFs won't block it
-    if (!req.headers['user-agent'] || /expo|hermes|node-fetch|axios|okhttp|curl/i.test(req.headers['user-agent'])) {
-      req.headers['user-agent'] = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
-    }
-  } catch (e) {
-    console.log('DEBUG middleware error', e && e.message);
-  }
+  // When response finished, log status and length
+  res.on('finish', () => {
+    try {
+      console.log('>>> RESPONSE FINISHED', {
+        time: new Date().toISOString(),
+        method: req.method,
+        originalUrl: req.originalUrl,
+        status: res.statusCode,
+        contentLength: res.getHeader('content-length') || 'unknown',
+        ip: req.ip || req.connection?.remoteAddress
+      });
+    } catch (e) { console.log('response logger err', e && e.message); }
+  });
+
   next();
 });
 
-app.get('/health-check-debug', (req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  res.json({
-    ok: true,
-    time: new Date().toISOString(),
-    ua_received: req.headers['user-agent'],
-    host_received: req.headers.host
-  });
+app.get('/health-check-plain', (req, res) => {
+  const payload = JSON.stringify({ ok: true, now: new Date().toISOString() });
+  // set explicit content-length
+  res.setHeader('Content-Length', Buffer.byteLength(payload, 'utf8'));
+  res.status(200).send(payload);
 });
 
 

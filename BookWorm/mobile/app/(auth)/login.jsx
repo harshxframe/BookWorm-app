@@ -69,7 +69,7 @@ const fetchViaProxy = async () => {
 
 const fetchWithUA = async () => {
   try {
-    const res = await fetch("https://bookworm-app-y7mx.onrender.com/health-check-debug", {
+    const res = await fetch("https://bookworm-app-y7mx.onrender.com/", {
       method: "GET",
       headers: {
         Accept: "application/json, text/plain, */*",
