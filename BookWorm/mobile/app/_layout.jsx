@@ -1,4 +1,12 @@
-// app/_layout.jsx
+if (__DEV__) {
+  // restore native XHR/Blob/FileReader implementations used by the RN native layer
+  global.XMLHttpRequest = global.originalXMLHttpRequest || global.XMLHttpRequest;
+  global.FormData = global.originalFormData || global.FormData;
+  global.Blob = global.originalBlob || global.Blob;
+  global.FileReader = global.originalFileReader || global.FileReader;
+}
+
+
 import { Slot, useRouter } from "expo-router";
 import { useEffect } from "react";
 
