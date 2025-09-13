@@ -6,7 +6,6 @@ import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../assets/styles/singup.js';
 import COLORS from "../../constant/colors.js";
-import axios from 'axios';
 const PlaceholderImage = require('@/assets/images/i.png');
 const icon = require('@/assets/images/image.png');
 
@@ -23,17 +22,39 @@ export default function SignUp() {
     // const res = await register(name, email, password);
     //  console.log(res.message);
     
-    
 //fetch('https://jsonplaceholder.typicode.com/todos/1').then(r => r.json()).then(console.log).catch(console.error);
-//fetch('https://bookworm-app-y7mx.onrender.com/').then(r => r.json()).then(console.log).catch(console.error);
-fetch("https://bookworm-app-y7mx.onrender.com/")
-  .then(r => {
-    console.log("status:", r.status);
-    return r.text();
-  })
-  .then(text => console.log("raw:", text))
-  .catch(e => console.error("error:", e));
+// fetch('https://bookworm-app-y7mx.onrender.com/',{
 
+// }).then(r => r.json()).then(console.log).catch(console.error);
+//   }
+
+fetch("https://bookworm-app-y7mx.onrender.com/", {
+  method: "GET",
+  headers: {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+  },
+  cache: "no-store",            // don’t reuse cached response
+  redirect: "follow",           // follow HTTP redirects
+  credentials: "omit",          // don’t send cookies/credentials
+})
+  .then(async (res) => {
+    console.log("status:", res.status);
+    console.log("headers:", {
+      "content-type": res.headers.get("content-type"),
+    });
+    const text = await res.text();
+    console.log("raw:", text);
+    try {
+      const json = JSON.parse(text);
+      console.log("json:", json);
+    } catch (e) {
+      console.warn("Response was not valid JSON");
+    }
+  })
+  .catch((err) => {
+    console.error("fetch error:", err.name, err.message, err);
+  });
 
 
   }
@@ -45,7 +66,6 @@ fetch("https://bookworm-app-y7mx.onrender.com/")
       <View style={styles.container}>
         <View style={styles.subContianer}>
           <View style={styles.card}>
-
             <View>
               <View style={styles.signUpHeading}>
                 <Text style={styles.headingText}>BookWorm</Text>
