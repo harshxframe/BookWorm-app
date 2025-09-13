@@ -2,7 +2,7 @@ import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../assets/styles/singup.js';
 import COLORS from "../../constant/colors.js";
@@ -16,6 +16,7 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const url = "https://bookworm-app-y7mx.onrender.com/health-check";
   const signup = async () => {
     console.log("Process Started");
     // const {register} = useAuthStore.getState();
@@ -28,36 +29,23 @@ export default function SignUp() {
 // }).then(r => r.json()).then(console.log).catch(console.error);
 //   }
 
-fetch("https://bookworm-app-y7mx.onrender.com/", {
-  method: "GET",
-  headers: {
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-  },
-  cache: "no-store",            // don’t reuse cached response
-  redirect: "follow",           // follow HTTP redirects
-  credentials: "omit",          // don’t send cookies/credentials
-})
-  .then(async (res) => {
-    console.log("status:", res.status);
-    console.log("headers:", {
-      "content-type": res.headers.get("content-type"),
-    });
-    const text = await res.text();
-    console.log("raw:", text);
-    try {
-      const json = JSON.parse(text);
-      console.log("json:", json);
-    } catch (e) {
-      console.warn("Response was not valid JSON");
-    }
-  })
-  .catch((err) => {
-    console.error("fetch error:", err.name, err.message, err);
-  });
-
 
   }
+
+  async function debugFetchIOS(url="https://bookworm-app-y7mx.onrender.com/health-check", method='GET', body=null) {
+  console.log('DEBUG START', Platform.OS, url, new Date().toISOString());
+  try {
+    const opts = { method, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: body ? JSON.stringify(body) : undefined };
+    const start = Date.now();
+    const res = await fetch(url, opts);
+    const took = Date.now() - start;
+    console.log('DEBUG OK', Platform.OS, url, 'status', res.status, 'tookMs', took);
+    const text = await res.text();
+    console.log('DEBUG raw:', text.slice(0, 1200));
+  } catch (err) {
+    console.error('DEBUG ERROR', { platform: Platform.OS, url, time: new Date().toISOString(), name: err?.name, message: err?.message, rawErr: err });
+  }
+}
 
 
 
@@ -112,7 +100,7 @@ fetch("https://bookworm-app-y7mx.onrender.com/", {
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                onPress={() => signup()}
+                onPress={() => debugFetchIOS()}
                 style={styles.button}>
                 <Text style={styles.buttonText}>
                   Sign Up
