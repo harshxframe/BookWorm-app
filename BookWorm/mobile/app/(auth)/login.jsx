@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../assets/styles/login.js';
 import COLORS from "../../constant/colors.js";
 const PlaceholderImage = require('@/assets/images/i.png');
+import { router } from 'expo-router';
 
 
 
@@ -18,61 +19,6 @@ const [response, setResponse] = useState({
   "message": "system running health check OK",
   "code": 501
 });
-
-
-// Paste this into a component and call it once (or run from useEffect)
-const checkHttpbin = async () => {
-  console.log("checkHttpbin -> start");
-  try {
-    const r = await fetch("https://httpbin.org/get");
-    console.log("httpbin status:", r.status);
-  } catch (err) {
-    console.log("httpbin ERROR:", err.name, err.message);
-  }
-};
-
-
-const testAxios = async () => {
- try {
-  console.log("Request Started!");
-  const id = "1  ";
-  const todoUrl = `https://jsonplaceholder.typicode.com/todos/${id}`;
-  const url = "https://bookworm-app-y7mx.onrender.com/"
-  const response = await axios.get(url.trim(), {
-    timeout: 10000,
-  });
-  console.log("Response:", response.data);
-  Alert.alert(response.error,"All done");
-} catch (error) {
-  if (error.code === 'ECONNABORTED') {
-    console.error("Request timed out. Check URL and network.");
-  } else if (error.response) {
-    console.error("Server responded with error:", error.response.status);
-  } else if (error.request) {
-    console.error("No response received. Network issue?");
-  } else {
-    console.error("Error:", error.message);
-  }
-}
-};
-
-const testNoCompression = async () => {
-  try {
-    const r = await fetch('https://bookworm-app-y7mx.onrender.com/', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Accept-Encoding': 'identity',
-        Connection: 'close'
-      }
-    });
-    console.log('iOS test status', r.status);
-    console.log('iOS test body', await r.text());
-  } catch (err) {
-    console.log('iOS test ERR', err.name, err.message);
-  }
-};
-
 
 
 
@@ -106,8 +52,7 @@ const testNoCompression = async () => {
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-              // onPress={()=>router.replace("/signup")} 
-              onPress={testNoCompression}
+              onPress={()=>router.replace("/signup")} 
               style={styles.button}>
                 <Text style={styles.buttonText}>
                  Login
@@ -115,7 +60,7 @@ const testNoCompression = async () => {
               </TouchableOpacity>
             </View>
             <View style={styles.textContainer}>
-              <Text style={styles.textStyleBottom}>{response.code.toString()}</Text>
+              <Text style={styles.textStyleBottom}>Don't have an account?</Text>
               <Text style={[styles.textStyleBottom, { color: COLORS.primary }]}>Sign Up</Text>
             </View>
           </View>
