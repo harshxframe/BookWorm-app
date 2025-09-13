@@ -24,8 +24,15 @@ export default function SignUp() {
     //  console.log(res.message);
     
     
-fetch('https://jsonplaceholder.typicode.com/todos/1').then(r => r.json()).then(console.log).catch(console.error);
-fetch('https://bookworm-app-y7mx.onrender.com/').then(r => r.json()).then(console.log).catch(console.error);
+//fetch('https://jsonplaceholder.typicode.com/todos/1').then(r => r.json()).then(console.log).catch(console.error);
+//fetch('https://bookworm-app-y7mx.onrender.com/').then(r => r.json()).then(console.log).catch(console.error);
+fetch("https://bookworm-app-y7mx.onrender.com/")
+  .then(r => {
+    console.log("status:", r.status);
+    return r.text();
+  })
+  .then(text => console.log("raw:", text))
+  .catch(e => console.error("error:", e));
 
 
 
