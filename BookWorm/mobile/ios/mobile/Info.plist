@@ -40,10 +40,18 @@
     <true/>
     <key>NSAppTransportSecurity</key>
     <dict>
-      <key>NSAllowsArbitraryLoads</key>
-      <false/>
-      <key>NSAllowsLocalNetworking</key>
-      <true/>
+      <key>NSExceptionDomains</key>
+      <dict>
+        <key>onrender.com</key>
+        <dict>
+          <key>NSIncludesSubdomains</key>
+          <true/>
+          <key>NSExceptionAllowsInsecureHTTPLoads</key>
+          <true/>
+          <key>NSExceptionRequiresForwardSecrecy</key>
+          <false/>
+        </dict>
+      </dict>
     </dict>
     <key>NSUserActivityTypes</key>
     <array>

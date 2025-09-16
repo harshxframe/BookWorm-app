@@ -1,13 +1,16 @@
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image } from 'expo-image';
-import { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View, Platform } from 'react-native';
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../assets/styles/singup.js';
 import COLORS from "../../constant/colors.js";
+import { useAuthStore } from '../../store/authStore.js';
 const PlaceholderImage = require('@/assets/images/i.png');
 const icon = require('@/assets/images/image.png');
+
 
 
 export default function SignUp() {
@@ -16,38 +19,25 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const url = "https://bookworm-app-y7mx.onrender.com/health-check";
-  const signup = async () => {
-    console.log("Process Started");
-    // const {register} = useAuthStore.getState();
-    // const res = await register(name, email, password);
-    //  console.log(res.message);
-    
-//fetch('https://jsonplaceholder.typicode.com/todos/1').then(r => r.json()).then(console.log).catch(console.error);
-// fetch('https://bookworm-app-y7mx.onrender.com/',{
+  const { register, token, isLoading } = useAuthStore();
 
-// }).then(r => r.json()).then(console.log).catch(console.error);
-//   }
+  const signUpMet = async () => {
+    const res = await register(name, email, password);
+    if(res.error){
+          console.log("My error"+res.error);
+       Alert.alert(res.message);
+    }else{
+          console.log("My error"+res.error);
+       Alert.alert(res.message);
+    }
 
 
   }
 
-  async function debugFetchIOS(url="https://bookworm-app-y7mx.onrender.com/health-check", method='GET', body=null) {
-  console.log('DEBUG START', Platform.OS, url, new Date().toISOString());
-  try {
-    const opts = { method, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: body ? JSON.stringify(body) : undefined };
-    const start = Date.now();
-    const res = await fetch(url, opts);
-    const took = Date.now() - start;
-    console.log('DEBUG OK', Platform.OS, url, 'status', res.status, 'tookMs', took);
-    const text = await res.text();
-    console.log('DEBUG raw:', text.slice(0, 1200));
-  } catch (err) {
-    console.error('DEBUG ERROR', { platform: Platform.OS, url, time: new Date().toISOString(), name: err?.name, message: err?.message, rawErr: err });
-  }
-}
-
-
+useEffect(()=>{
+console.log(isLoading);
+},[isLoading]);
+  
 
   return (
     <SafeAreaView>
@@ -100,7 +90,7 @@ export default function SignUp() {
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                onPress={() => debugFetchIOS()}
+                onPress={() => signUpMet()}
                 style={styles.button}>
                 <Text style={styles.buttonText}>
                   Sign Up
@@ -109,7 +99,11 @@ export default function SignUp() {
             </View>
             <View style={styles.textContainer}>
               <Text style={styles.textStyleBottom}>Don't have an account?</Text>
-              <Text style={[styles.textStyleBottom, { color: COLORS.primary }]}>Sign Up</Text>
+              <TouchableOpacity onPress={()=>{
+                router.replace("/login")
+              }}>
+              <Text style={[styles.textStyleBottom, { color: COLORS.primary }]}>LogIn</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>

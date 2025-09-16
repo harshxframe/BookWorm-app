@@ -61,7 +61,7 @@ app.use("/app",review); //for review creation
 
 
 
-app.listen(2000, ()=>{
+app.listen(2000,"0.0.0.0", ()=>{
     console.log("Server started!");
 });
 
